@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>N-Queens | Puzzle Arena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="container">
+    <header class="topbar">
+        <a class="brand" href="/">🧩 Puzzle Arena</a>
+        <a class="back-link" href="/">← Home</a>
+    </header>
+
+    <section class="page-heading">
+        <p class="eyebrow">LOGIC CHALLENGE</p>
+        <h1>♛ N-Queens</h1>
+        <p class="muted">No shared rows, columns or diagonals.</p>
+    </section>
+
+    <section class="panel">
+        <form method="POST">
+            <label for="n">Board size (N)</label>
+            <input id="n" name="n" type="number" min="1" max="14"
+                   value="{{ n }}" required>
+
+            <div class="button-row">
+                <button name="action" value="solve" class="button purple-button">
+                    Solve puzzle
+                </button>
+                <button name="action" value="hint" class="button secondary-button">
+                    Get a hint
+                </button>
+            </div>
+
+            {% if hint_question %}
+            <div class="math-box">
+                <h3>🧠 Quick maths challenge</h3>
+                <p>Answer this question to unlock your hint:</p>
+                <strong>{{ hint_question }}</strong>
+                <label for="math_answer">Your answer</label>
+                <input id="math_answer" name="math_answer" type="number" required>
+                <button name="action" value="check_hint" class="button green-button">
+                    Unlock hint
+                </button>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if message %}
+        <div class="message">{{ message }}</div>
+        {% endif %}
+
+        {% if result %}
+        <div class="chess-board" style="--n: {{ n }}">
+            {% for r in range(n) %}
+                {% for c in range(n) %}
+                <div class="chess-cell {% if (r+c)%2 == 0 %}light-cell{% else %}dark-cell{% endif %}">
+                    {% if result[r] == c %}♛{% endif %}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>
