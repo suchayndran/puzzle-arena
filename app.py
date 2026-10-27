@@ -185,6 +185,25 @@ def queens():
         "queens.html", n=n, result=result,
         message=message, hint_question=hint_question
     )
+    def check_queens(queens, n):
+    if len(queens) != n:
+        return False
+
+    rows = [r for r, c in queens]
+    cols = [c for r, c in queens]
+
+    if len(set(rows)) != n or len(set(cols)) != n:
+        return False
+
+    for i in range(n):
+        for j in range(i + 1, n):
+            r1, c1 = queens[i]
+            r2, c2 = queens[j]
+
+            if abs(r1 - r2) == abs(c1 - c2):
+                return False
+
+    return True
 
 
 # ---------- SUDOKU PAGE ----------
