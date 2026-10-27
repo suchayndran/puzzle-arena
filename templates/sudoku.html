@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sudoku | Puzzle Arena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="container">
+    <header class="topbar">
+        <a class="brand" href="/">🧩 Puzzle Arena</a>
+        <a class="back-link" href="/">← Home</a>
+    </header>
+
+    <section class="page-heading">
+        <p class="eyebrow">NUMBER CHALLENGE</p>
+        <h1>▦ Sudoku</h1>
+        <p class="muted">Fill every row, column and 3×3 box with numbers 1–9.</p>
+    </section>
+
+    <section class="panel">
+        <form method="POST">
+            <div class="sudoku-board">
+                {% for r in range(9) %}
+                <div class="sudoku-row">
+                    {% for c in range(9) %}
+                    <input
+                        class="cell
+                        {% if c in [2, 5] %}thick-right{% endif %}
+                        {% if r in [2, 5] %}thick-bottom{% endif %}
+                        {% if puzzle[r][c] != 0 %}given{% endif %}"
+                        type="number"
+                        min="1" max="9"
+                        name="cell_{{ r }}_{{ c }}"
+                        aria-label="Row {{ r+1 }}, column {{ c+1 }}"
+                        value="{{ board[r][c] if board[r][c] != 0 else '' }}"
+                        {% if puzzle[r][c] != 0 %}readonly{% endif %}>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="button-row">
+                <button name="action" value="check" class="button green-button">
+                    Check answer
+                </button>
+                <button name="action" value="solve" class="button purple-button">
+                    Solve with Python
+                </button>
+                <button name="action" value="hint" class="button secondary-button">
+                    Get a hint
+                </button>
+                <button name="action" value="new" class="button secondary-button">
+                    New Sudoku
+                </button>
+            </div>
+
+            {% if hint_question %}
+            <div class="math-box">
+                <h3>🧠 Quick maths challenge</h3>
+                <p>Answer this question to unlock your hint:</p>
+                <strong>{{ hint_question }}</strong>
+                <label for="math_answer">Your answer</label>
+                <input id="math_answer" name="math_answer" type="number" required>
+                <button name="action" value="check_hint" class="button green-button">
+                    Unlock hint
+                </button>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if message %}
+        <div class="message">{{ message }}</div>
+        {% endif %}
+
+        {% if solved_board %}
+        <h2>Python's solution</h2>
+        <div class="solution-grid">
+            {% for row in solved_board %}
+            <div class="solution-row">
+                {% for number in row %}
+                <span>{{ number }}</span>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+</main>
+</body>
+</html>
