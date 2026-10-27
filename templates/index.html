@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Puzzle Arena</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        <header class="topbar">
+            <a class="brand" href="/">🧩 Puzzle Arena</a>
+            <span class="tag">THINK. SOLVE. IMPROVE.</span>
+        </header>
+
+        <section class="hero">
+            <p class="eyebrow">YOUR NEXT CHALLENGE</p>
+            <h1>Train your <span>problem-solving</span> skills.</h1>
+            <p class="muted">Choose a puzzle, think logically, and solve it with Python-powered tools.</p>
+        </section>
+
+        <section class="game-grid">
+            <article class="game-card purple">
+                <div class="game-icon">♛</div>
+                <p class="eyebrow">LOGIC & BACKTRACKING</p>
+                <h2>N-Queens</h2>
+                <p>Place queens on a chessboard so that no two queens attack each other.</p>
+                <a class="button purple-button" href="/queens">Play N-Queens →</a>
+            </article>
+
+            <article class="game-card green">
+                <div class="game-icon">▦</div>
+                <p class="eyebrow">NUMBERS & LOGIC</p>
+                <h2>Sudoku</h2>
+                <p>Challenge yourself with a fresh random 9×9 Sudoku puzzle.</p>
+                <a class="button green-button" href="/sudoku">Play Sudoku →</a>
+            </article>
+        </section>
+
+        <section class="info-card">
+            <div class="game-icon">💡</div>
+            <div>
+                <h3>Earn your hints</h3>
+                <p class="muted">Answer a basic maths question to unlock a helpful hint for your puzzle.</p>
+            </div>
+        </section>
+
+        <footer>Built with Python, Flask and backtracking.</footer>
+    </main>
+</body>
+</html>
