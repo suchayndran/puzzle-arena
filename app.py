@@ -30,9 +30,13 @@ def solve_queens(n):
                     return True
 
                 board[r] = -1
+
         return False
 
     return board if solve(0) else None
+
+
+# ---------- CHECK MANUAL N-QUEENS ----------
 
 def check_queens(queens, n):
     if len(queens) != n:
@@ -53,6 +57,8 @@ def check_queens(queens, n):
                 return False
 
     return True
+
+
 # ---------- SUDOKU SOLVER ----------
 
 def solve_sudoku(b):
@@ -75,7 +81,9 @@ def solve_sudoku(b):
                             return True
 
                         b[r][c] = 0
+
                 return False
+
     return True
 
 
@@ -147,11 +155,20 @@ def queens():
     result = None
     message = ""
     hint_question = None
+    manual_queens = []
+    manual_message = ""
+
+    # Restore a pending manual board after submission
+    if request.method == "GET":
+        saved = session.pop("manual_queens", [])
+        manual_queens = [
+            tuple(cell) for cell in saved
+        ]
 
     if request.method == "POST":
         try:
             n = int(request.form.get("n", 4))
-        except ValueError:
+        except (ValueError, TypeError):
             n = 4
 
         if not 1 <= n <= 14:
@@ -172,16 +189,19 @@ def queens():
             session["q_answer"] = a
             session["q_n"] = n
             session["q_question"] = q
+            hint_question = q
 
         elif action == "check_hint":
             hint_question = session.get("q_question")
             answer = request.form.get("math_answer", "")
 
-            if answer.lstrip("-").isdigit() and (
-                int(answer) == session.get("q_answer")
+            if (
+                answer.lstrip("-").isdigit()
+                and int(answer) == session.get("q_answer")
                 and n == session.get("q_n")
             ):
                 result = solve_queens(n)
+
                 if result is not None:
                     message = (
                         f"Hint: Try placing the first queen "
@@ -190,35 +210,68 @@ def queens():
                 else:
                     message = "No solution exists for this size."
             else:
-                message = "Incorrect answer or changed board size. Try again."
+                message = (
+                    "Incorrect answer or changed board size. "
+                    "Try again."
+                )
 
             session.pop("q_answer", None)
             session.pop("q_question", None)
             session.pop("q_n", None)
-    elif action == "check_manual":
-        selected = request.form.getlist("queen")
-        manual_queens = [
-            tuple(map(int, cell.split(",")))
-            for cell in selected
+            hint_question = None
+
+        elif action == "check_manual" and not message:
+            selected = request.form.getlist("queen")
+
+            try:
+                manual_queens = [
+                    tuple(map(int, cell.split(",")))
+                    for cell in selected
+                ]
+            except (ValueError, TypeError):
+                manual_queens = []
+
+            valid_coordinates = all(
+                len(cell) == 2
+                and 0 <= cell[0] < n
+                and 0 <= cell[1] < n
+                for cell in manual_queens
+            )
+
+            if not valid_coordinates:
+                manual_queens = []
+                manual_message = "Invalid board selection. Try again."
+            elif check_queens(manual_queens, n):
+                manual_message = (
+                    "Correct! All queens are safely placed."
+                )
+            else:
+                manual_message = (
+                    "Not correct yet. Check the number of queens, "
+                    "rows, columns and diagonals."
+                )
+
+        elif action == "reset_manual":
+            manual_queens = []
+            manual_message = ""
+
+        # Preserve selected queens across page reloads
+        session["manual_queens"] = [
+            list(cell) for cell in manual_queens
         ]
-
-        if check_queens(manual_queens, n):
-            result = "Correct! All queens are safely placed."
-        else:
-            result = "Invalid arrangement. Try again!"
-
-    elif action == "reset_manual":
-        manual_queens = []
-        result = ""
 
     if not hint_question:
         hint_question = session.get("q_question")
 
     return render_template(
-        "queens.html",manual_queens=manual_queens, n=n, result=result,
-        message=message, hint_question=hint_question
+        "queens.html",
+        n=n,
+        result=result,
+        message=message,
+        hint_question=hint_question,
+        manual_queens=manual_queens,
+        manual_message=manual_message
     )
-
 
 
 # ---------- SUDOKU PAGE ----------
@@ -256,8 +309,10 @@ def sudoku():
 
         for r in range(9):
             row = []
+
             for c in range(9):
                 value = request.form.get(f"cell_{r}_{c}", "")
+
                 if value == "":
                     row.append(0)
                 elif value.isdigit() and 1 <= int(value) <= 9:
@@ -265,6 +320,7 @@ def sudoku():
                 else:
                     row.append(0)
                     valid = False
+
             board.append(row)
 
         # Keep original clues unchanged.
@@ -280,6 +336,7 @@ def sudoku():
 
         elif action == "solve":
             copy_board = [row[:] for row in board]
+
             if solve_sudoku(copy_board):
                 solved_board = copy_board
                 message = "Solution found!"
@@ -303,10 +360,12 @@ def sudoku():
         elif action == "check_hint":
             answer = request.form.get("math_answer", "")
 
-            if answer.lstrip("-").isdigit() and (
-                int(answer) == session.get("s_answer")
+            if (
+                answer.lstrip("-").isdigit()
+                and int(answer) == session.get("s_answer")
             ):
                 found = False
+
                 for r in range(9):
                     for c in range(9):
                         if board[r][c] == 0:
@@ -316,6 +375,7 @@ def sudoku():
                             )
                             found = True
                             break
+
                     if found:
                         break
 
@@ -329,8 +389,11 @@ def sudoku():
             hint_question = None
 
     return render_template(
-        "sudoku.html", puzzle=puzzle, board=board,
-        message=message, hint_question=hint_question,
+        "sudoku.html",
+        puzzle=puzzle,
+        board=board,
+        message=message,
+        hint_question=hint_question,
         solved_board=solved_board
     )
 
