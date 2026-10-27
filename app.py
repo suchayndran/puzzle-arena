@@ -195,12 +195,27 @@ def queens():
             session.pop("q_answer", None)
             session.pop("q_question", None)
             session.pop("q_n", None)
+    elif action == "check_manual":
+        selected = request.form.getlist("queen")
+        manual_queens = [
+            tuple(map(int, cell.split(",")))
+            for cell in selected
+        ]
+
+        if check_queens(manual_queens, n):
+            result = "Correct! All queens are safely placed."
+        else:
+            result = "Invalid arrangement. Try again!"
+
+    elif action == "reset_manual":
+        manual_queens = []
+        result = ""
 
     if not hint_question:
         hint_question = session.get("q_question")
 
     return render_template(
-        "queens.html", n=n, result=result,
+        "queens.html",manual_queens=manual_queens, n=n, result=result,
         message=message, hint_question=hint_question
     )
 
