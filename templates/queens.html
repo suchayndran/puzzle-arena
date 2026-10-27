@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>N-Queens | Puzzle Arena</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <main class="container">
@@ -17,20 +18,25 @@
     <section class="page-heading">
         <p class="eyebrow">LOGIC CHALLENGE</p>
         <h1>♛ N-Queens</h1>
-        <p class="muted">No shared rows, columns or diagonals.</p>
+        <p class="muted">
+            No shared rows, columns or diagonals.
+        </p>
     </section>
 
     <section class="panel">
+        <!-- BOARD SIZE -->
         <form method="POST">
             <label for="n">Board size (N)</label>
-            <input id="n" name="n" type="number" min="1" max="14"
-                   value="{{ n }}" required>
+            <input id="n" name="n" type="number"
+                   min="1" max="14" value="{{ n }}" required>
 
             <div class="button-row">
-                <button name="action" value="solve" class="button purple-button">
-                    Solve puzzle
+                <button name="action" value="solve"
+                        class="button purple-button">
+                    Solve with Python
                 </button>
-                <button name="action" value="hint" class="button secondary-button">
+                <button name="action" value="hint"
+                        class="button secondary-button">
                     Get a hint
                 </button>
             </div>
@@ -41,8 +47,10 @@
                 <p>Answer this question to unlock your hint:</p>
                 <strong>{{ hint_question }}</strong>
                 <label for="math_answer">Your answer</label>
-                <input id="math_answer" name="math_answer" type="number" required>
-                <button name="action" value="check_hint" class="button green-button">
+                <input id="math_answer" name="math_answer"
+                       type="number" required>
+                <button name="action" value="check_hint"
+                        class="button green-button">
                     Unlock hint
                 </button>
             </div>
@@ -53,18 +61,109 @@
         <div class="message">{{ message }}</div>
         {% endif %}
 
+        <!-- PYTHON SOLUTION BOARD -->
         {% if result %}
+        <h2>Python Solution</h2>
         <div class="chess-board" style="--n: {{ n }}">
             {% for r in range(n) %}
                 {% for c in range(n) %}
-                <div class="chess-cell {% if (r+c)%2 == 0 %}light-cell{% else %}dark-cell{% endif %}">
+                <div class="chess-cell
+                    {% if (r+c)%2 == 0 %}light-cell{% else %}dark-cell{% endif %}">
                     {% if result[r] == c %}♛{% endif %}
                 </div>
                 {% endfor %}
             {% endfor %}
         </div>
         {% endif %}
+
+        <hr>
+
+        <!-- MANUAL MODE -->
+        <h2>✍️ Manual Mode</h2>
+        <p class="muted">
+            Select squares to place queens. Place exactly one queen
+            in each row and column, with no diagonal attacks.
+        </p>
+
+        <form method="POST" id="manual-form">
+            <input type="hidden" name="n" value="{{ n }}">
+
+            <div class="chess-board manual-board"
+                 style="--n: {{ n }}">
+                {% for r in range(n) %}
+                    {% for c in range(n) %}
+                    <label class="chess-cell
+                        {% if (r+c)%2 == 0 %}light-cell{% else %}dark-cell{% endif %}">
+                        <input type="checkbox" name="queen"
+                               value="{{ r }},{{ c }}"
+                               {% if manual_queens and (r,c) in manual_queens %}checked{% endif %}
+                               aria-label="Row {{ r+1 }}, column {{ c+1 }}">
+                        <span>♛</span>
+                    </label>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+
+            <div class="button-row">
+                <button type="submit" name="action"
+                        value="check_manual"
+                        class="button green-button">
+                    Check Arrangement
+                </button>
+
+                <button type="submit" name="action"
+                        value="reset_manual"
+                        class="button secondary-button">
+                    Reset Board
+                </button>
+            </div>
+        </form>
+
+        {% if manual_message %}
+        <div class="message">{{ manual_message }}</div>
+        {% endif %}
     </section>
 </main>
+
+<style>
+.manual-board .chess-cell {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    aspect-ratio: 1;
+}
+
+.manual-board input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.manual-board span {
+    visibility: hidden;
+    font-size: clamp(12px, 4vw, 30px);
+    color: #111827;
+    pointer-events: none;
+}
+
+.manual-board input:checked + span {
+    visibility: visible;
+}
+
+.manual-board input:focus-visible + span {
+    outline: 3px solid #a78bfa;
+}
+
+.manual-board .chess-cell:has(input:checked) {
+    outline: 2px solid #7c3aed;
+    outline-offset: -3px;
+}
+</style>
 </body>
 </html>
